@@ -28,6 +28,7 @@ socket.on('connect', function() {
         url: `${window.location.origin}/?room=${params.room}`
       }).then(() => {
         console.log('Thanks for sharing!');
+        alert("sharing")
       })
       .catch(console.error);
     } else {

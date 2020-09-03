@@ -10,11 +10,18 @@ button,button:hover{border:none;color:#fff;padding:10px}.chat__messages,.chat__s
         padding: 2px 10px 2px 10px;
         border-radius: 10px 10px 0 0;
     }
+    #invite{
+        right: -9px;
+    }
+
     .chat__sidebar{
         position: absolute;
         left: -260px;
     }
 
+}
+body{
+    height: 100%;
 }
 
 @media (min-width:600px){
@@ -23,12 +30,13 @@ button,button:hover{border:none;color:#fff;padding:10px}.chat__messages,.chat__s
         position: absolute;
         top: 20px;
     }
-    
+    #invite{
+        right: 8px;
+    }
 }
 
 #invite{
     position: absolute;
-    right: 8px;
     padding: 5px 20px 5px 20px;
     border-radius: 0 0 0 10px;
     background-color: darkturquoise;
