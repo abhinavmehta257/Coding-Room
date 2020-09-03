@@ -4,11 +4,12 @@ function scrollToBottom() {
   let messages = document.querySelector('#messages').lastElementChild;
   messages.scrollIntoView();
 }
-
+let params;
 socket.on('connect', function() {
   let searchQuery = window.location.search.substring(1);
-  let params = JSON.parse('{"' + decodeURI(searchQuery).replace(/&/g, '","').replace(/\+/g, ' ').replace(/=/g,'":"') + '"}');
-
+  console.log(window.location.origin);
+  params = JSON.parse('{"' + decodeURI(searchQuery).replace(/&/g, '","').replace(/\+/g, ' ').replace(/=/g,'":"') + '"}');
+  console.log(params);
   socket.emit('join', params, function(err) {
     if(err){
       alert(err);
@@ -16,8 +17,24 @@ socket.on('connect', function() {
     }else {
       console.log('No Error');
     }
-  })
+  });
 });
+
+  const invite_btn = document.querySelector('#invite') 
+    invite_btn.addEventListener('click', function(){
+    if (navigator.share) {
+      navigator.share({
+        title: `Invite to ${param.room}`,
+        url: `${window.location.origin}/?room=${params.room}`
+      }).then(() => {
+        console.log('Thanks for sharing!');
+      })
+      .catch(console.error);
+    } else {
+       copy(`${window.location.origin}/?room=${params.room}`);
+    }
+
+    })
 
 socket.on('disconnect', function() {
   console.log('disconnected from server.');
@@ -81,17 +98,40 @@ document.querySelector('#submit-btn').addEventListener('click', function(e) {
   })
 })
 
-document.querySelector('#send-location').addEventListener('click', function(e) {
-  if (!navigator.geolocation) {
-    return alert('Geolocation is not supported by your browser.')
-  }
 
-  navigator.geolocation.getCurrentPosition(function(position) {
-    socket.emit('createLocationMessage', {
-      lat: position.coords.latitude,
-      lng: position.coords.longitude
-    })
-  }, function() {
-    alert('Unable to fetch location.')
-  })
-});
+
+function copy(txt){
+  var cb = document.getElementById("cb");
+  cb.value = txt;
+  cb.style.display='block';
+  cb.select();
+  document.execCommand('copy');
+  cb.style.display='none';
+
+  alert("room link is copied")
+ }
+
+ participent_list_open = false
+$('.chat__main').click(function(){
+  if(participent_list_open){
+    $('.chat__sidebar').animate({left:'-260px'})
+    $('#sidebar-collapser').animate({left:'-=260px'})
+      participent_list_open = false
+      console.log("main chat clicked");
+  }
+})
+ function slidein(){
+   if(participent_list_open){
+    $('.chat__sidebar').animate({left:'-260px'})
+    $('#sidebar-collapser').animate({left:'-=260px'})
+    participent_list_open = false
+   }else{
+    $('.chat__sidebar').animate({left:'0'})
+    $('#sidebar-collapser').animate({left:'+=260px'})
+    participent_list_open = true
+   }
+  
+
+  // $('#userNav').show("slide", { direction: "right" }, 1000);
+   console.log("btn clicked");
+ }

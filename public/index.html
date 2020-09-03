@@ -24,5 +24,15 @@
       </form>
     </div>
 
+    <script>
+      let searchQuery = window.location.search.substring(1);
+      if(searchQuery){
+        let params = JSON.parse('{"' + decodeURI(searchQuery).replace(/=/g,'":"') + '"}');
+        document.querySelector('input[name="room"]').value = params.room;
+      }else{
+        console.log("no querie");
+      }
+
+    </script>
   </body>
 </html>

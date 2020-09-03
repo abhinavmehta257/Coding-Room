@@ -8,10 +8,14 @@
   </head>
   <body class="chat">
 
-    <div class="chat__sidebar">
-      <h3>People</h3>
-      <div id="users"></div>
+    <div>
+      <div class="chat__sidebar">
+        <h3>People</h3>
+        <div id="users"></div>
+      </div>
+      <button id="sidebar-collapser" onclick="slidein()"><span>participent</span></button>
     </div>
+    
 
     <div class="chat__main">
       <ol id="messages" class="chat__messages"></ol>
@@ -21,10 +25,12 @@
           <input name="message" type="text" placeholder="Message" autofocus autocomplete="off"/>
           <button id="submit-btn">Send</button>
         </form>
-        <button id="send-location">Send location</button>
+        <!-- <button id="send-location">Send location</button> -->
       </div>
     </div>
 
+    <button id='invite'>Invite</button>
+    <input id="cb" type="text" hidden>
     <script id="message-template" type="text/template">
       <li class="message">
         <div class="message__title">
@@ -48,10 +54,12 @@
         </div>
       </li>
     </script>
-
+    
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
     <script src="/socket.io/socket.io.js"></script>
     <script type="text/javascript" src="/js/chat.js"></script>
     <script type="text/javascript" src="/js/libs/moment.js"></script>
     <script type="text/javascript" src="/js/libs/mustache.js"></script>
+    
   </body>
 </html>
