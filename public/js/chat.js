@@ -22,7 +22,7 @@ socket.on('connect', function() {
 
   const invite_btn = document.querySelector('#invite') 
     invite_btn.addEventListener('click', function(){
-    if (navigator.share) {
+    if (navigator.Share) {
       navigator.share({
         title: `Invite to ${param.room}`,
         url: `${window.location.origin}/?room=${params.room}`
