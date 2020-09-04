@@ -5,32 +5,41 @@
     <title></title>
     <meta name="viewport" content="width=device-width, inital-scale=1, user-scalable=no">
     <link rel="stylesheet" href="/css/styles.css">
+    <script src="http://email.tl.fortawesome.com/c/eJxNjksOwiAUAE9TlgQer1AWLKqt94ACAe3HFNR4e1mazGoWk_HGB-mDItkAA8Y0Q84RQFJOr-yiZ8mVmmbdTyN2yOpK43FW-wnl2AJdjo0kMwTpuET02i285yyij1EwQLfYATyQ1aRan6UTYwe3xquEltn_M82qXocBhbSW3gs5TQ2lbjav7mtdyrt9w0O0hZSB5v0HA_o3zw"></script>
   </head>
   <body class="chat">
 
     <div>
       <div class="chat__sidebar">
         <h3>People</h3>
+        <hr>
         <div id="users"></div>
       </div>
-      <button id="sidebar-collapser" onclick="slidein()"><span>participent</span></button>
+      <button id="sidebar-collapser" onclick="participentListToggle()"><span>Participent</span></button>
     </div>
     
-
-    <div class="chat__main">
-      <ol id="messages" class="chat__messages"></ol>
-
-      <div class="chat__footer">
-        <form id="message-form">
-          <input name="message" type="text" placeholder="Message" autofocus autocomplete="off"/>
-          <button id="submit-btn">Send</button>
-        </form>
-        <!-- <button id="send-location">Send location</button> -->
+   
+      <div class="chat__main">
+        <ol id="messages" class="chat__messages"></ol>
+  
+        <div class="chat__footer">
+          <form id="message-form">
+            <input name="message" type="text" placeholder="Message" autofocus autocomplete="off"/>
+            <button id="submit-btn">Send</button>
+          </form>
+        </div>
       </div>
-    </div>
+      <button id="chat-collapser" onclick="chatToggle()"><span>Chat</span></button>
+    
+    
 
     <button id='invite'>Invite</button>
-    <input id="cb" type="text" hidden>
+   
+      <div id="screen">
+
+      </div>
+
+
     <script id="message-template" type="text/template">
       <li class="message">
         <div class="message__title">
@@ -43,23 +52,16 @@
       </li>
     </script>
 
-    <script id="location-message-template" type="text/template">
-      <li class="message">
-        <div class="message__title">
-          <h4>{{from}}</h4>
-          <span>{{createdAt}}</span>
-        </div>
-        <div class="message__body">
-          <a href="{{url}}" target="_blank">My current location</a>
-        </div>
-      </li>
-    </script>
+    <div>
+      <input id="cb" type="text" hidden>
+      <script src="/js/libs/jquery-3.5.1.min.js"></script>
+      <script src="/socket.io/socket.io.js"></script>
+      <script type="text/javascript" src="/js/chat_interaction.js"></script>
+      <script type="text/javascript" src="/js/chat.js"></script>
+      <script type="text/javascript" src="/js/libs/moment.js"></script>
+      <script type="text/javascript" src="/js/libs/mustache.js"></script>
+    </div>
     
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
-    <script src="/socket.io/socket.io.js"></script>
-    <script type="text/javascript" src="/js/chat.js"></script>
-    <script type="text/javascript" src="/js/libs/moment.js"></script>
-    <script type="text/javascript" src="/js/libs/mustache.js"></script>
     
   </body>
 </html>

@@ -16,6 +16,10 @@ let users = new Users();
 
 app.use(express.static(publicPath));
 
+// app.post('/chat.html', function(req, res){
+//     console.log(res.body);
+// })
+
 io.on('connection', (socket) => {
   console.log("A new user just connected");
 

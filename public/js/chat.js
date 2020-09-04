@@ -111,28 +111,3 @@ function copy(txt){
 
   alert("room link is copied")
  }
-
- participent_list_open = false
-$('.chat__main').click(function(){
-  if(participent_list_open){
-    $('.chat__sidebar').animate({left:'-260px'})
-    $('#sidebar-collapser').animate({left:'-=260px'})
-      participent_list_open = false
-      console.log("main chat clicked");
-  }
-})
- function slidein(){
-   if(participent_list_open){
-    $('.chat__sidebar').animate({left:'-260px'})
-    $('#sidebar-collapser').animate({left:'-=260px'})
-    participent_list_open = false
-   }else{
-    $('.chat__sidebar').animate({left:'0'})
-    $('#sidebar-collapser').animate({left:'+=260px'})
-    participent_list_open = true
-   }
-  
-
-  // $('#userNav').show("slide", { direction: "right" }, 1000);
-   console.log("btn clicked");
- }
