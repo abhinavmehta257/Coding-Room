@@ -4,12 +4,16 @@ function scrollToBottom() {
   let messages = document.querySelector('#messages').lastElementChild;
   messages.scrollIntoView();
 }
-let params;
+
 socket.on('connect', function() {
   let searchQuery = window.location.search.substring(1);
+  console.log("shocket connection");
   console.log(window.location.origin);
-  params = JSON.parse('{"' + decodeURI(searchQuery).replace(/&/g, '","').replace(/\+/g, ' ').replace(/=/g,'":"') + '"}');
-  console.log(params);
+  // params = JSON.parse('{"' + decodeURI(searchQuery).replace(/&/g, '","').replace(/\+/g, ' ').replace(/=/g,'":"') + '"}');
+  let params;
+  socket.on('newmember',function (newmemberData){
+    params = newmemberData
+    console.log(params);
   socket.emit('join', params, function(err) {
     if(err){
       alert(err);
@@ -18,6 +22,16 @@ socket.on('connect', function() {
       console.log('No Error');
     }
   });
+  })
+  // console.log(params);
+  // socket.emit('join', params, function(err) {
+  //   if(err){
+  //     alert(err);
+  //     window.location.href = '/';
+  //   }else {
+  //     console.log('No Error');
+  //   }
+  // });
 });
 
   const invite_btn = document.querySelector('#invite') 

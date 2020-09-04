@@ -16,12 +16,25 @@ let users = new Users();
 
 app.use(express.static(publicPath));
 
-// app.post('/chat.html', function(req, res){
-//     console.log(res.body);
-// })
+// Parse URL-encoded bodies (as sent by HTML forms)
+app.use(express.urlencoded());
+
+// Parse JSON bodies (as sent by API clients)
+app.use(express.json());
+
+
+let newmember
+// Access the parse results as request.body
+app.post('/chat.html', function(request, response){
+    console.log(request.body);
+    newmember = request.body;
+    response.redirect('/chat.html')
+}); 
 
 io.on('connection', (socket) => {
   console.log("A new user just connected");
+
+  socket.emit('newmember',newmember, ()=>{console.log("data emited");});
 
   socket.on('join', (params, callback) => {
     if(!isRealString(params.name) || !isRealString(params.room)){
@@ -38,7 +51,7 @@ io.on('connection', (socket) => {
     // socket.broadcast.to(params.room).emit('newMessage', generateMessage('Admin', "New User Joined!"));
 
     callback();
-  })
+  });
 
   socket.on('createMessage', (message, callback) => {
     let user = users.getUser(socket.id);
@@ -65,7 +78,7 @@ io.on('connection', (socket) => {
       // io.to(user.room).emit('newMessage', generateMessage('Admin', `${user.name} has left ${user.room} chat room.`))
     }
   });
-});
+});    
 
 server.listen(port, ()=>{
   console.log(`Server is up on port ${port}`);
