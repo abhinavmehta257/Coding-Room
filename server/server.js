@@ -6,6 +6,7 @@ const socketIO = require('socket.io');
 const {generateMessage, generateLocationMessage} = require('./utils/message');
 const {isRealString} = require('./utils/isRealString');
 const {Users} = require('./utils/users');
+const { exit } = require('process');
 
 const publicPath = path.join(__dirname, '/../public');
 const port = process.env.PORT || 3000
@@ -23,59 +24,60 @@ app.use(express.urlencoded());
 app.use(express.json());
 
 
-let newmember
+let newmember;
 // Access the parse results as request.body
 app.post('/chat.html', function(request, response){
-    console.log(request.body);
-    newmember = request.body;
-    response.redirect('/chat.html')
-}); 
+  // console.log(request.body);
+  newmember = request.body;
+  response.redirect('/chat.html')
+}) 
 
 io.on('connection', (socket) => {
-  console.log("A new user just connected");
-
-  socket.emit('newmember',newmember, ()=>{console.log("data emited");});
-
-  socket.on('join', (params, callback) => {
-    if(!isRealString(params.name) || !isRealString(params.room)){
-      return callback('Name and room are required');
+  // console.log("A new user just connected");
+  console.log("A new user just connected: ",newmember);
+  socket.emit('newmember',newmember, ()=>{});
+  newmember = null;
+  
+   socket.on('join', (params, callback) => {
+    try {
+      if(!isRealString(params.name)){
+        return callback('Name and room are required');
+      }
+  
+      socket.join(params.roomId);
+      users.removeUser(socket.id);
+      users.addUser(socket.id, params.name, params.roomId);
+  
+      io.to(params.roomId).emit('updateUsersList', users.getUserList(params.roomId));
+      socket.emit('newMessage', generateMessage('Admin', `Welocome 😊`));
+  
+      // socket.broadcast.to(params.roomId).emit('newMessage', generateMessage('Admin', "New User Joined!"));
+  
+      callback();
+    } catch (error) {
+      socket.emit('connectionError',{error:"connection Error"});
+      users.removeUser(socket.id);
+      socket.disconnect();
     }
-
-    socket.join(params.room);
-    users.removeUser(socket.id);
-    users.addUser(socket.id, params.name, params.room);
-
-    io.to(params.room).emit('updateUsersList', users.getUserList(params.room));
-    socket.emit('newMessage', generateMessage('Admin', `Welocome to ${params.room}!`));
-
-    // socket.broadcast.to(params.room).emit('newMessage', generateMessage('Admin', "New User Joined!"));
-
-    callback();
-  });
+    });
+  
 
   socket.on('createMessage', (message, callback) => {
     let user = users.getUser(socket.id);
 
     if(user && isRealString(message.text)){
-        io.to(user.room).emit('newMessage', generateMessage(user.name, message.text));
+        io.to(user.roomId).emit('newMessage', generateMessage(user.name, message.text));
     }
     callback('This is the server:');
   })
 
-  socket.on('createLocationMessage', (coords) => {
-    let user = users.getUser(socket.id);
-
-    if(user){
-      io.to(user.room).emit('newLocationMessage', generateLocationMessage(user.name, coords.lat, coords.lng))
-    }
-  })
-
+  
   socket.on('disconnect', () => {
     let user = users.removeUser(socket.id);
 
     if(user){
-      io.to(user.room).emit('updateUsersList', users.getUserList(user.room));
-      // io.to(user.room).emit('newMessage', generateMessage('Admin', `${user.name} has left ${user.room} chat room.`))
+      io.to(user.roomId).emit('updateUsersList', users.getUserList(user.roomId));
+      //  io.to(user.roomId).emit('newMessage', generateMessage('Admin', `${user.name} has left ${user.roomId} chat room.`))
     }
   });
 });    

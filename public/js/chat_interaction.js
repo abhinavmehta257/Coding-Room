@@ -49,3 +49,21 @@ function chatOpen(){
     chat_open = true;
 }
 
+const invite_btn = document.querySelector('#invite')
+    invite_btn.addEventListener('click', function(){
+        console.log("invite btn clicked");    
+    });
+
+function copy(txt){
+  var cb = document.getElementById("cb");
+  cb.value = txt;
+  cb.style.display='block';
+  cb.select();
+  document.execCommand('copy');
+  cb.style.display='none';
+
+  alert("room link is copied")
+ }
+
+
+ 

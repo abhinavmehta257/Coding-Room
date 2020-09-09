@@ -4,21 +4,23 @@
 //   room: 'node js'
 // }]
 
+//start adding roomid, room name
+
 
 class Users {
   constructor() {
     this.users = [];
   }
 
-  addUser(id, name, room) {
-    let user = {id, name, room};
+  addUser(id, name, roomId) {
+    let user = {id, name, roomId};
     this.users.push(user);
     return user;
   }
 
-  getUserList (room) {
-    let users = this.users.filter((user) => user.room === room);
-    let namesArray = users.map((user) => user.name);
+  getUserList (roomId) {
+    let users = this.users.filter((user) => user.roomId === roomId);
+    let namesArray = users.map((user) => user);
 
     return namesArray;
   }
