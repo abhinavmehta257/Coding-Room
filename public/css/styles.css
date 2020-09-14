@@ -57,11 +57,12 @@ button,button:hover{border:none;color:#fff;padding:10px}.chat__messages,.chat__s
 
 #invite{
     position: absolute;
-    z-index: -1;
+    z-index: 1;
     padding: 5px 20px 5px 20px;
     border-radius: 0 0 0 10px;
     background-color: darkturquoise;
     margin-right: 10px;
+    display: none;
 }
 
 body{
@@ -87,6 +88,7 @@ background:#121212;
 }
 
 
+
 .home__form{
     margin: auto;
     width:30%;
@@ -96,6 +98,8 @@ background:#121212;
     text-align: center;
     padding-top: 10vh;
     color: black;
+    min-width: 350px;
+    min-height: 180px;
 }
 .home__form button{
     border-radius: 10px !important;
@@ -116,4 +120,13 @@ background:#121212;
 .home__form #createRoom {
     background: #E07541 !important;
     padding: 15px 10px;
+}
+
+#admin{
+    display: none;
+}
+.chat__sidebar #users li button{
+    padding: 2px 5px !important;
+    border-radius: 3px;
+    display: none;
 }

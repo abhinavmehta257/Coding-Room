@@ -12,8 +12,9 @@ class Users {
     this.users = [];
   }
 
-  addUser(id, name, roomId) {
-    let user = {id, name, roomId};
+  
+  addUser(id, name, roomId, isAdmin) {
+    let user = {id, name, roomId, isAdmin};
     this.users.push(user);
     return user;
   }
@@ -27,6 +28,16 @@ class Users {
 
   getUser(id) {
     return this.users.filter((user) => user.id === id)[0];
+  }
+
+  checkIsAdmin(id){
+   let user = this.getUser(id);
+
+    if(user.isAdmin){
+      return true;
+    }else{
+      return false;
+    }
   }
 
   removeUser(id) {

@@ -6,7 +6,6 @@ const socketIO = require('socket.io');
 const {generateMessage, generateLocationMessage} = require('./utils/message');
 const {isRealString} = require('./utils/isRealString');
 const {Users} = require('./utils/users');
-const { exit } = require('process');
 
 const publicPath = path.join(__dirname, '/../public');
 const port = process.env.PORT || 3000
@@ -14,7 +13,7 @@ let app = express();
 let server = http.createServer(app);
 let io = socketIO(server);
 let users = new Users();
-
+let roomList = [];
 app.use(express.static(publicPath));
 
 // Parse URL-encoded bodies (as sent by HTML forms)
@@ -29,7 +28,16 @@ let newmember;
 app.post('/chat.html', function(request, response){
   // console.log(request.body);
   newmember = request.body;
-  response.redirect('/chat.html')
+  if(request.body.isAdmin == 'on'){
+    newmember.isAdmin = true;
+    roomList.push(newmember.roomId)
+  }
+  if(roomList.includes(newmember.roomId) || newmember.isAdmin){
+    response.redirect("/chat.html");
+  }else{
+    response.send("room donot exist try again");
+  }
+  
 }) 
 
 io.on('connection', (socket) => {
@@ -46,10 +54,14 @@ io.on('connection', (socket) => {
   
       socket.join(params.roomId);
       users.removeUser(socket.id);
-      users.addUser(socket.id, params.name, params.roomId);
+      users.addUser(socket.id, params.name, params.roomId, params.isAdmin);
   
       io.to(params.roomId).emit('updateUsersList', users.getUserList(params.roomId));
-      socket.emit('newMessage', generateMessage('Admin', `Welocome 😊`));
+      if(params.isAdmin){
+      socket.emit('newMessage', generateMessage('Coding Room', `Welocome Admin😊`));
+      }else{
+        socket.emit('newMessage', generateMessage('Admin', `Welocome 😊`));
+      }
   
       // socket.broadcast.to(params.roomId).emit('newMessage', generateMessage('Admin', "New User Joined!"));
   
@@ -71,14 +83,42 @@ io.on('connection', (socket) => {
     callback('This is the server:');
   })
 
+  socket.on('removeUser',(data)=>{
+    console.log("remove user called");
+    isAdmin = users.checkIsAdmin(data.senderId);
+    console.log(isAdmin);
+    console.log(data.userId);
+    if(isAdmin){
+      let user = users.getUser(data.userId);
+      console.log(user);
+      if(user){
+        console.log(`user ${data.senderId} does have permission to remove user`);
+        io.to(user.roomId).emit('updateUsersList', users.getUserList(user.roomId));
+        io.sockets.sockets[user.id].disconnect();
+      }else{
+        console.log(`user: ${data.senderId} does not have permission to remove user: ${data.userId}`);
+      }
+    }
+  })
   
   socket.on('disconnect', () => {
     let user = users.removeUser(socket.id);
-
-    if(user){
-      io.to(user.roomId).emit('updateUsersList', users.getUserList(user.roomId));
-      //  io.to(user.roomId).emit('newMessage', generateMessage('Admin', `${user.name} has left ${user.roomId} chat room.`))
+    try{
+      if(user.isAdmin){
+        newAdmin = users.getUserList(user.roomId)[0];
+        newAdmin.isAdmin = true;
+        io.to(user.roomId).emit('updateUsersList', users.getUserList(user.roomId));
+        io.to(newAdmin.id).emit('youAreNewAdmin',{isAdmin:true});
+      }else{
+        io.to(user.roomId).emit('updateUsersList', users.getUserList(user.roomId));
+      }
+    }catch(err){
+      console.log(err);
+      socket.emit('connectionError',{error:"connection Error"});
+      users.removeUser(socket.id);
+      socket.disconnect();
     }
+    
   });
 });    
 

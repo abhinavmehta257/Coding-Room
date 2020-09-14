@@ -1,0 +1,13 @@
+#admin{
+    display: block !important;
+    color:white;
+    margin: auto;
+}
+#invite{
+    display: block !important;
+}
+li button{
+    margin-right: 5px;
+    display: inline !important;
+    float: right !important;
+}

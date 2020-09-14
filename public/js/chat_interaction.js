@@ -51,17 +51,19 @@ function chatOpen(){
 
 const invite_btn = document.querySelector('#invite')
     invite_btn.addEventListener('click', function(){
-        console.log("invite btn clicked");    
+        console.log('invie btn clicked');
+        link = `${window.location.origin}/joinRoom.html?roomId=${window.roomId}`;
+        copy(link);  
     });
 
 function copy(txt){
+    console.log("copy called");
   var cb = document.getElementById("cb");
   cb.value = txt;
   cb.style.display='block';
   cb.select();
   document.execCommand('copy');
   cb.style.display='none';
-
   alert("room link is copied")
  }
 
