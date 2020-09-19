@@ -38,14 +38,14 @@ function participentListClose(){
 }
 
 function chatClose(){
-    $(`.chat__main`).animate({left:'-260'});
-    $('#chat-collapser').animate({left:'-=260px'});
+    $(`.chat__main`).animate({left:'-275'});
+    $('#chat-collapser').animate({left:'-=275px'});
     chat_open = false;
 }
 
 function chatOpen(){
     $(`.chat__main`).animate({left:'0'});
-    $('#chat-collapser').animate({left:'+=260px'});
+    $('#chat-collapser').animate({left:'+=275px'});
     chat_open = true;
 }
 

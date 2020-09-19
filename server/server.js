@@ -6,6 +6,7 @@ const socketIO = require('socket.io');
 const {generateMessage, generateLocationMessage} = require('./utils/message');
 const {isRealString} = require('./utils/isRealString');
 const {Users} = require('./utils/users');
+const {Rooms} = require('./utils/rooms');
 
 const publicPath = path.join(__dirname, '/../public');
 const port = process.env.PORT || 3000
@@ -13,7 +14,7 @@ let app = express();
 let server = http.createServer(app);
 let io = socketIO(server);
 let users = new Users();
-let roomList = [];
+let roomList = new Rooms();
 app.use(express.static(publicPath));
 
 // Parse URL-encoded bodies (as sent by HTML forms)
@@ -30,9 +31,9 @@ app.post('/chat.html', function(request, response){
   newmember = request.body;
   if(request.body.isAdmin == 'on'){
     newmember.isAdmin = true;
-    roomList.push(newmember.roomId)
+    roomList.addRoom(newmember.roomId);
   }
-  if(roomList.includes(newmember.roomId) || newmember.isAdmin){
+  if(roomList.getRoom(newmember.roomId) || newmember.isAdmin){
     response.redirect("/chat.html");
   }else{
     response.send("room donot exist try again");
@@ -104,14 +105,20 @@ io.on('connection', (socket) => {
   socket.on('disconnect', () => {
     let user = users.removeUser(socket.id);
     try{
-      if(user.isAdmin){
-        newAdmin = users.getUserList(user.roomId)[0];
-        newAdmin.isAdmin = true;
-        io.to(user.roomId).emit('updateUsersList', users.getUserList(user.roomId));
-        io.to(newAdmin.id).emit('youAreNewAdmin',{isAdmin:true});
+      if(users.getUserList(user.roomId).length ==0){
+        roomList.removeRoom(user.roomId);
       }else{
-        io.to(user.roomId).emit('updateUsersList', users.getUserList(user.roomId));
+        if(user.isAdmin){
+          newAdmin = users.getUserList(user.roomId)[0];
+          newAdmin.isAdmin = true;
+          io.to(user.roomId).emit('updateUsersList', users.getUserList(user.roomId));
+          io.to(newAdmin.id).emit('youAreNewAdmin',{isAdmin:true});
+        }else{
+          io.to(user.roomId).emit('updateUsersList', users.getUserList(user.roomId));
+        }
       }
+      
+      
     }catch(err){
       console.log(err);
       socket.emit('connectionError',{error:"connection Error"});
