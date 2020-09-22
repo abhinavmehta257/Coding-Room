@@ -75,7 +75,7 @@
             <hr>
             <div id="users"></div>
           </div>
-          <button id="sidebar-collapser" onclick="participentListToggle()"><span>Participent</span></button>
+          <button id="sidebar-collapser" onclick="participentListToggle()"><span style="padding: 2px;">Participent</span></button>
         </div>
          
         <div class="chat">
@@ -108,7 +108,7 @@
         </script>
 
         <script id="participent-template" type="text/template">
-            {{User.name}} {{^User.isAdmin}}<button class="getCode" ><\></button><button class="removeUser" id="{{{User.id}}}" onclick='removeUser(this)' style="background:red;">=></button>{{/User.isAdmin}}{{#User.isAdmin}}(A){{/User.isAdmin}}
+            {{User.name}} {{^User.isAdmin}}<button class="getCode" id="{{{User.id}}}" onclick = "getCode(this)"><\></button><button class="removeUser" id="{{{User.id}}}" onclick='removeUser(this)' style="background:red;">=></button>{{/User.isAdmin}}{{#User.isAdmin}}(A){{/User.isAdmin}}
         </script>
 
       </div>
@@ -290,13 +290,13 @@
         <script type="text/javascript" src="/js/chat_interaction.js"></script>
         <script type="text/javascript" src="/js/chat.js"></script>
       </div>
-    <script>
+    <!-- <script>
         let CLF_config = {
             selector: ".changelogfy-widget",
             app_id: "f6f982d0-3d91-4b1c-a3ce-b0eb54606c4e"
         };
     </script>
-    <script async src="https://widget.changelogfy.com/index.js"></script>
+    <script async src="https://widget.changelogfy.com/index.js"></script> -->
 </body>
 
 </html>

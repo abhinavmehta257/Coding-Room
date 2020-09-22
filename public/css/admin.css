@@ -11,3 +11,6 @@ li button{
     display: inline !important;
     float: right !important;
 }
+.send-btn{
+    display: inline !important;
+}

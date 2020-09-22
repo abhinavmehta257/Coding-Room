@@ -51,6 +51,7 @@ var messagesData;
 
 var layoutConfig = {
     settings: {
+        selectionEnabled: true,
         showPopoutIcon: false,
         reorderEnabled: true
     },
@@ -76,25 +77,27 @@ var layoutConfig = {
                     type: "component",
                     componentName: "video",
                     title: "Video",
-                    isClosable: true,
+                    isClosable: false,
                     componentState: {
                         readOnly: false
                     }
                 }]
             }, {
+                type:"row",
+                content : [{
                 type: "stack",
                 content: [{
-                    type: "component",
-                    componentName: "stdin",
-                    title: "STDIN",
-                    isClosable: false,
-                    componentState: {
-                        readOnly: false
-                    }
-                }, {
                         type: "component",
-                        componentName: "stdout",
-                        title: "STDOUT",
+                        componentName: "stdin",
+                        title: "STDIN",
+                        isClosable: false,
+                        componentState: {
+                            readOnly: false
+                        }
+                    }, {
+                        type: "component",
+                        componentName: "compile output",
+                        title: "COMPILE OUTPUT",
                         isClosable: false,
                         componentState: {
                             readOnly: true
@@ -107,23 +110,27 @@ var layoutConfig = {
                         componentState: {
                             readOnly: true
                         }
-                    }, {
-                        type: "component",
-                        componentName: "compile output",
-                        title: "COMPILE OUTPUT",
-                        isClosable: false,
-                        componentState: {
-                            readOnly: true
-                        }
-                    }, {
-                        type: "component",
-                        componentName: "sandbox message",
-                        title: "SANDBOX MESSAGE",
-                        isClosable: false,
-                        componentState: {
-                            readOnly: true
-                        }
                     }]
+                },{
+                    type : "stack",
+                    content :[{
+                            type: "component",
+                            componentName: "stdout",
+                            title: "STDOUT",
+                            isClosable: false,
+                            componentState: {
+                                readOnly: true
+                            }
+                        }, {
+                            type: "component",
+                            componentName: "sandbox message",
+                            title: "SANDBOX MESSAGE",
+                            isClosable: false,
+                            componentState: {
+                                readOnly: true
+                            }
+                        }]
+                }]
             }]
         }]
     }]
@@ -385,6 +392,11 @@ function run() {
         $runBtn.addClass("loading");
     }
 
+    activeEditorname = layout.root.contentItems[ 0 ].contentItems[0].getActiveContentItem().componentName
+
+    activeEditor = editors.filter((editor)=>editor.name == activeEditorname);
+
+
     document.getElementById("stdout-dot").hidden = true;
     document.getElementById("stderr-dot").hidden = true;
     document.getElementById("compile-output-dot").hidden = true;
@@ -395,7 +407,13 @@ function run() {
     compileOutputEditor.setValue("");
     sandboxMessageEditor.setValue("");
 
-    var sourceValue = encode(sourceEditor.getValue());
+    if(activeEditor){
+        sourceValue = encode(activeEditor[0].newEditor.getValue());
+    }else{
+        var sourceValue = encode(sourceEditor.getValue());
+    }
+    
+    var sourceValue = encode(activeEditor[0].newEditor.getValue());
     var stdinValue = encode(stdinEditor.getValue());
     var languageId = resolveLanguageId($selectLanguage.val());
     var compilerOptions = $compilerOptions.val();
@@ -504,6 +522,8 @@ function insertTemplate() {
     sourceEditor.setValue(sources[currentLanguageId]);
     changeEditorLanguage();
 }
+
+//set room language
 
 function loadRandomLanguage() {
     var values = [];
@@ -706,28 +726,6 @@ $(document).ready(function () {
             sourceEditor.onDidLayoutChange(resizeEditor);
         });
 
-        layout.registerComponent("studentCode", function (container, state) {
-            studentCodeEditor = monaco.editor.create(container.getElement()[0], {
-                automaticLayout: true,
-                theme: "vs-dark",
-                scrollBeyondLastLine: true,
-                readOnly: state.readOnly,
-                language: "cpp",
-                minimap: {
-                    enabled: false
-                },
-                rulers: [80, 120]
-            });
-
-            changeEditorMode();
-
-            studentCodeEditor.getModel().onDidChangeContent(function (e) {
-                
-            });
-
-            studentCodeEditor.onDidLayoutChange(resizeEditor);
-        });
-
         layout.registerComponent("video", function(container, state){
             container.getElement().html( `<iframe style="width: inherit; height: inherit;" src="https://www.youtube.com/embed/${videoId}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>` );
         })
@@ -836,6 +834,7 @@ $(document).ready(function () {
         });
 
         layout.init();
+
     });
 });
 

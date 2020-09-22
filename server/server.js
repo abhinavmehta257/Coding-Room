@@ -47,33 +47,46 @@ io.on('connection', (socket) => {
   socket.emit('newmember',newmember, ()=>{});
   newmember = null;
   
-   socket.on('join', (params, callback) => {
-    try {
-      if(!isRealString(params.name)){
-        return callback('Name and room are required');
+  socket.on('join', (params, callback) => {
+      try {
+        if(!isRealString(params.name)){
+          return callback('Name and room are required');
+        }
+    
+        socket.join(params.roomId);
+        users.removeUser(socket.id);
+        users.addUser(socket.id, params.name, params.roomId, params.isAdmin);
+    
+        io.to(params.roomId).emit('updateUsersList', users.getUserList(params.roomId));
+        if(params.isAdmin){
+        socket.emit('newMessage', generateMessage('Coding Room', `Welocome Admin😊`));
+        }else{
+          socket.emit('newMessage', generateMessage('Admin', `Welocome 😊`));
+        }
+    
+        // socket.broadcast.to(params.roomId).emit('newMessage', generateMessage('Admin', "New User Joined!"));
+    
+        callback();
+      } catch (error) {
+        socket.emit('connectionError',{error:"connection Error"});
+        users.removeUser(socket.id);
+        socket.disconnect();
       }
-  
-      socket.join(params.roomId);
-      users.removeUser(socket.id);
-      users.addUser(socket.id, params.name, params.roomId, params.isAdmin);
-  
-      io.to(params.roomId).emit('updateUsersList', users.getUserList(params.roomId));
-      if(params.isAdmin){
-      socket.emit('newMessage', generateMessage('Coding Room', `Welocome Admin😊`));
-      }else{
-        socket.emit('newMessage', generateMessage('Admin', `Welocome 😊`));
-      }
-  
-      // socket.broadcast.to(params.roomId).emit('newMessage', generateMessage('Admin', "New User Joined!"));
-  
-      callback();
-    } catch (error) {
-      socket.emit('connectionError',{error:"connection Error"});
-      users.removeUser(socket.id);
-      socket.disconnect();
+  });
+    
+  socket.on("getCode",(data)=>{
+    admin = users.checkIsAdmin(data.senderId);
+
+    if(admin){
+      io.sockets.sockets[data.userId].emit("giveCode",data)
     }
-    });
-  
+  })
+
+  socket.on("sendCode",(codeData)=>{
+    user = users.getUser(codeData.from)
+    io.sockets.sockets[codeData.to].emit("gotCode",{codeData,user});
+    // console.log("server got code",codeData);
+  })
 
   socket.on('createMessage', (message, callback) => {
     let user = users.getUser(socket.id);

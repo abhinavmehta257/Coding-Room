@@ -1,10 +1,30 @@
 let socket = io();
-window.roomId;
+// window.roomId;
+window.editors = [];
+//function used
 function scrollToBottom() {
   let messages = document.querySelector('#messages').lastElementChild;
   messages.scrollIntoView();
 }
+function initialiseAdmin(){
+  $.getScript('/js/adminWindow.js', function() {
+    console.log("Admin script loaded");
+  });
+}
+function encode(str) {
+  return btoa(unescape(encodeURIComponent(str || "")));
+}
 
+function decode(bytes) {
+  var escaped = escape(atob(bytes || ""));
+  try {
+      return decodeURIComponent(escaped);
+  } catch {
+      return unescape(escaped);
+  }
+}
+
+//socket code
 socket.on('connect', function() {
   console.log("shocket connected");
   let params;
@@ -92,11 +112,53 @@ socket.on('youAreNewAdmin',function(isAdmin){
     // console.log("wrong person");
   }
 });
-function initialiseAdmin(){
-    $.getScript('/js/adminWindow.js', function() {
-      console.log("Admin script loaded");
+
+socket.on("giveCode",function(data){
+  var to = data.senderId;
+  var from = socket.id;
+  var codeString = encode(sourceEditor.getValue());
+  // alert("code demanded by admin");
+  codeData = {
+    to,from,codeString
+  }
+  socket.emit("sendCode",codeData);
+  // console.log("user send code: ",codeData);
+})
+
+socket.on("gotCode", function(data){
+  // check mocha docs for getting data from jquery element
+  var newItemConfig = {
+    title: `${data.user.name}`,
+    type: 'component',
+    componentName: `${data.user.name}`,
+    isClosable: true,
+    componentState: { 
+        readOnly : false
+    }
+  };
+  newCode = data.codeData.codeString;
+  name = data.user.name;
+
+  layout.registerComponent(`${data.user.name}`, function(container, state){
+    studentId = data.user.id;
+    container.getElement().html(`<button class="send-btn" style="float:right; padding:2px !important" id="${studentId}" onclick='sendCode(this)'>Send Code<button>`);
+     let newEditor = monaco.editor.create(container.getElement()[0], {
+        automaticLayout: true,
+        theme: "vs-dark",
+        scrollBeyondLastLine: true,
+        readOnly: state.readOnly,
+        language: "cpp",
+        minimap: {
+            enabled: false
+        },
+        rulers: [80, 120]
+      });
+      newEditor.setValue(decode(data.codeData.codeString));
+      
+      editorData = {name, newEditor};
+      editors.push(editorData);
     });
-}
-
-
+    
+    layout.root.contentItems[ 0 ].contentItems[0].addChild( newItemConfig );
+})
 
