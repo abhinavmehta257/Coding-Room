@@ -51,7 +51,6 @@ var messagesData;
 
 var layoutConfig = {
     settings: {
-        selectionEnabled: true,
         showPopoutIcon: false,
         reorderEnabled: true
     },
@@ -61,6 +60,12 @@ var layoutConfig = {
     },
     content: [{
         type: "row",
+        labels: {
+            close: 'close',
+            maximise: 'maximise',
+            minimise: 'minimise',
+            popout: 'open in new window'
+        },
         content: [{
                 type:"component",
                 componentName: "source",
@@ -392,9 +397,10 @@ function run() {
         $runBtn.addClass("loading");
     }
 
-    activeEditorname = layout.root.contentItems[ 0 ].contentItems[0].getActiveContentItem().componentName
+    // activeEditorname = layout.root.contentItems[ 0 ].contentItems[0].getActiveContentItem().componentName
 
-    activeEditor = editors.filter((editor)=>editor.name == activeEditorname);
+    // activeEditorCode = editors.filter((editor)=>editor.editorId == activeEditorname);
+    activeEditorCode = layout.root.contentItems[ 0 ].contentItems[0].getActiveContentItem().container.getElement()[0].getElementsByClassName("view-lines")[0].innerText;
 
 
     document.getElementById("stdout-dot").hidden = true;
@@ -407,13 +413,14 @@ function run() {
     compileOutputEditor.setValue("");
     sandboxMessageEditor.setValue("");
 
-    if(activeEditor){
-        sourceValue = encode(activeEditor[0].newEditor.getValue());
+    if(activeEditorCode){
+        // sourceValue = encode(activeEditor[0].newEditor.getValue());
+        sourceValue = encode(activeEditorCode);
     }else{
-        var sourceValue = encode(sourceEditor.getValue());
+       sourceValue = encode(sourceEditor.getValue());
     }
     
-    var sourceValue = encode(activeEditor[0].newEditor.getValue());
+    // var sourceValue = encode(activeEditor[0].newEditor.getValue());
     var stdinValue = encode(stdinEditor.getValue());
     var languageId = resolveLanguageId($selectLanguage.val());
     var compilerOptions = $compilerOptions.val();
@@ -834,6 +841,8 @@ $(document).ready(function () {
         });
 
         layout.init();
+        
+        
 
     });
 });

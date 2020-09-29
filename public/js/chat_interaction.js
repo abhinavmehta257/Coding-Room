@@ -1,6 +1,7 @@
 
 let participent_list_open = false
 let chat_open = false
+let filenumber = 1;
 function participentListToggle(){
     if(participent_list_open){
         participentListClose();
@@ -65,7 +66,37 @@ function copy(txt){
   document.execCommand('copy');
   cb.style.display='none';
   alert("room link is copied")
- }
+}
 
+function addNewFile(){
+    newFile = `newFile${filenumber}`;
+    var newItemConfig = {
+        title: `${newFile}`,
+        type: 'component',
+        componentName: `${newFile}`,
+        isClosable: true,
+        componentState: { 
+            readOnly : false
+        }
+      };
+    
+        layout.registerComponent(`${newFile}`, function(container, state){
+          let newEditor = monaco.editor.create(container.getElement()[0], {
+              automaticLayout: true,
+              theme: "vs-dark",
+              scrollBeyondLastLine: true,
+              readOnly: state.readOnly,
+              language: "cpp",
+              minimap: {
+                  enabled: false
+              },
+              rulers: [80, 120]
+            });
+            newEditor.setValue("");
+            });
+          
+          layout.root.contentItems[0].contentItems[0].addChild( newItemConfig );
+          filenumber++;
+}
 
  

@@ -115,6 +115,13 @@ io.on('connection', (socket) => {
     }
   })
   
+  socket.on("raiseHand", (id)=>{
+   let user = users.getUser(id);
+    name = user.name;
+    console.log(users.getRoomAdmin(user.roomId));
+    io.sockets.sockets[users.getRoomAdmin(user.roomId).id].emit("handRaised",name);
+  })
+
   socket.on('disconnect', () => {
     let user = users.removeUser(socket.id);
     try{

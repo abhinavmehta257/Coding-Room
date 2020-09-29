@@ -1,6 +1,6 @@
 let socket = io();
 // window.roomId;
-window.editors = [];
+// window.editors = [];
 //function used
 function scrollToBottom() {
   let messages = document.querySelector('#messages').lastElementChild;
@@ -130,35 +130,44 @@ socket.on("gotCode", function(data){
   var newItemConfig = {
     title: `${data.user.name}`,
     type: 'component',
-    componentName: `${data.user.name}`,
+    componentName: `${data.user.id}`,
     isClosable: true,
     componentState: { 
         readOnly : false
     }
   };
   newCode = data.codeData.codeString;
-  name = data.user.name;
+  editorId = data.user.id;
 
-  layout.registerComponent(`${data.user.name}`, function(container, state){
-    studentId = data.user.id;
-    container.getElement().html(`<button class="send-btn" style="float:right; padding:2px !important" id="${studentId}" onclick='sendCode(this)'>Send Code<button>`);
-     let newEditor = monaco.editor.create(container.getElement()[0], {
-        automaticLayout: true,
-        theme: "vs-dark",
-        scrollBeyondLastLine: true,
-        readOnly: state.readOnly,
-        language: "cpp",
-        minimap: {
-            enabled: false
-        },
-        rulers: [80, 120]
-      });
-      newEditor.setValue(decode(data.codeData.codeString));
+  if(layout.root.contentItems[0].getComponentsByName( editorId )[0]){
+    console.log(layout.root.contentItems[0].getComponentsByName( editorId )[0]);
+    console.log("editor alredy exist");
+  }else{
+    layout.registerComponent(`${editorId}`, function(container, state){
+        studentId = data.user.id;
+        container.getElement().html(`<button class="send-btn" style="float:right; padding:2px !important" id="${studentId}" onclick='sendCode(this)'>Send Code<button>`);
+      let newEditor = monaco.editor.create(container.getElement()[0], {
+          automaticLayout: true,
+          theme: "vs-dark",
+          scrollBeyondLastLine: true,
+          readOnly: state.readOnly,
+          language: "cpp",
+          minimap: {
+              enabled: false
+          },
+          rulers: [80, 120]
+        });
+        newEditor.setValue(decode(data.codeData.codeString));
+        
+        // editorData = {editorId, newEditor};
+        // editors.push(editorData);
+        });
       
-      editorData = {name, newEditor};
-      editors.push(editorData);
-    });
-    
-    layout.root.contentItems[ 0 ].contentItems[0].addChild( newItemConfig );
+      layout.root.contentItems[0].contentItems[0].addChild( newItemConfig );
+    }
 })
 
+function raiseHand(){
+  socketID = socket.id;
+  socket.emit("raiseHand",socketID)
+}

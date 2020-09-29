@@ -40,6 +40,14 @@ class Users {
     }
   }
 
+  getRoomAdmin(id){
+    let userlist = this.getUserList(id);
+    let admin = userlist.filter((user) => user.isAdmin === true)[0];
+
+    return admin;
+
+  }
+
   removeUser(id) {
     let user = this.getUser(id);
 
